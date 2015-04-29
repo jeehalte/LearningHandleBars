@@ -1,0 +1,20 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <title>Handlebars Expressions</title>
+    <script src="../js/handlebars.js"></script>
+  </head>
+  <body>
+    <script id="template" type="template/handlebars">
+      {{content}} - not encoded
+      {{SafeString content}} - SafeString
+    </script>
+    <script>
+      var src = document.getElementById("template").innerHTML;
+      var template = Handlebars.compile(src);
+
+      var output = template({content: "<h1>Hello</h1>"});
+      document.body.innerHTML += output;
+    </script>
+  </body>
+</html>

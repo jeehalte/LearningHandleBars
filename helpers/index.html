@@ -1,0 +1,217 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <title>Handlebars Quickstart</title>
+    <script src="../js/handlebars.js"></script>
+  </head>
+  <body>
+    <script type="text/javascript">
+      Handlebars.registerHelper("caps", function(text, options) {
+        return (!options.hash.lower || options.hash.lower === "no") ? text.toUpperCase() : text.toLowerCase();
+      });
+      
+      Handlebars.registerHelper("greeting", function (options){
+      switch (options.data.language) {
+        case "en":
+          return "Welcome"
+        case "de":
+          return "Willkommen"
+        case "fr":
+          return "Bienvenue"
+        case "he":
+          return "Baruch Haba"
+        default:
+          return "Welcome"
+      };
+    });
+
+  Handlebars.registerHelper("optionMe", function(options) {
+      var list = options.fn();
+
+      list = list.trim().split("\n");
+
+      var out = "<select>";
+      for (var i in list) {
+        var item = list[i].trim();
+        out += "<option value='" + item + "'>" 
+              + item 
+              + "</option>";
+      }
+      
+      out += "</select>";
+    
+      return out;
+    });      
+
+    Handlebars.registerHelper("listX", function (number, name, options) {
+      var num = parseInt(number);
+      var out = "";
+
+      for (var i = 1; i <= 10; i++) {
+        var data = {
+          number: i,
+          result: Math.pow(num, i),
+          name: name
+        }
+        
+        out += options.fn(data);
+    }
+
+      return out;
+    });
+
+    Handlebars.registerHelper("notifications", function(notifs, options){
+    var out = "";
+        for (var i in notifs) {
+          if (notifs[i].important) {
+            out += options.inverse(notifs[i]);
+          } else {
+            out += options.fn(notifs[i]);
+          }
+      }
+        return out;
+    });
+
+    Handlebars.registerHelper("formIt", function(data, options){
+        var fields = {};
+        //Generate the Inputs
+        for (var k in data) {
+          var v = data[k];
+          var html = "";
+          switch (typeof v) {
+            case "string":
+              v = Handlebars.Utils.escapeExpression(v);
+              html = '<input type="text" name="' + k + '" value="' + v + '" />';
+              break;
+            case "number":
+              html = '<input type="number" name="' + k + '" value="' + v + '" />';
+              break;
+            case "boolean":
+              var checked = (v) ? "checked" : "";
+              html = '<input type="checkbox" name="' + k + '" ' + checked + ' />';
+              break;
+          }
+          fields[k] = new Handlebars.SafeString(html);
+        }
+      
+        var out = "<form>";
+        if (typeof options.fn == "undefined") {
+          //If it's a tag helper then add each element manually
+          for (var k in fields) {
+            out += "<div>" + k + ": " + fields[k] + "</div>";
+          }
+
+          //Add the button
+          out += '<input type="submit" value="submit">';
+        } else {
+          //If it's a block helper add the button and run the template
+          var button = '<input type="submit" value="submit">';
+          
+          fields.submit = new Handlebars.SafeString(button);
+          out += options.fn(fields);
+        }
+
+        out += "</form>";
+        return new Handlebars.SafeString(out);
+      });    
+
+
+    </script>
+    <script id="quickstart" type="template/handlebars">
+      <h1>{{greeting}} {{caps name lower="yes"}}</h1>
+      <ul>
+        {{#each messages}}
+          <li><b>{{from}}</b>: {{caps text lower="yes"}}</li>
+        {{/each}} 
+      </ul>
+
+     {{#optionMe}}
+        bird
+        dog
+        cat
+        turtle
+        rabbit
+        horse
+      {{/optionMe}}
+
+      <ul>
+        {{#listX 9 'jerret'}}
+          <li><b>9<sup>{{number}}</sup></b> = {{result}}</li>
+        {{/listX}}
+      </ul>      
+
+      <h2 style="color:green">inverse example<h2>
+  
+      {{#notifications notes}}
+        <div>{{title}}</div>
+      {{else}}
+        <div style="color:red">
+          <b>{{title}}</b>
+        </div>
+    {{/notifications}}
+
+    <h2 style="color:green">block and tag helper example</h2>
+
+    <div>
+    <h2>Block Version</h2>
+      {{#formIt user}}
+        <div>Name: {{name}}</div>
+        <div>Age: {{age}}</div>
+        <div>Receive Newsletter ?: {{newsletter}}</div>
+        {{submit}}
+      {{/formIt}}
+    </div>
+    <div>
+      <h2>Tag Version</h2>
+      {{formIt user}}
+    </div>
+    <h2>If block helper</h2>
+    {{#if name}}
+          Hi
+          {{else}}
+          nope
+    {{/if}}
+
+    </script>
+    </script>
+   
+    <script>
+      var src = document.getElementById('quickstart').innerHTML;      
+      var template = Handlebars.compile(src);
+
+      var fooIfTest = function() {
+        return 2 == 2;
+      };
+
+      var options = {
+        data: {
+          language: "fr"
+        }
+      };
+
+      var data = {
+        name: "Jerret",
+        messages: [
+          { from: "John", text: "Demo Message" },
+          { from: "Bob", text: "Somethig Else" },
+          { from: "John", text: "Second Post" }
+        ],
+        notes: [
+          { title: "process #235 finished running", important: false },
+          { title: "assets have been compiled", important: false },
+          { title: "web server has crashed !!", important: true },
+          { title: "22 unread emails in inbox", important: false },
+          { title: "worker #3444 waiting for input", important: true }
+        ],
+        user: {
+          name: "John Smith",
+          age: 25,
+          newsletter: true
+        }       
+      };
+
+      var output = template(data, options);
+      document.body.innerHTML += output;
+    </script>
+  </body>
+</html>

@@ -1,0 +1,4 @@
+{{> header}}
+  {{!-- Convert the user's name into a username styled format --}}
+  Welcome back {{userfy name}}!
+{{> footer}}

@@ -1,0 +1,10 @@
+Here is how to setup a simple static web server.
+
+
+1. Install node.js https://nodejs.org/
+2. Install https://www.npmjs.com/package/local-web-server
+
+
+notes:
+
+If you run into any issues with npm then follow the instructions here: http://stackoverflow.com/questions/22152162/npm-cannot-install-dependencies-attempt-to-unlock-something-which-hasnt-been
